@@ -1,4 +1,3 @@
-
 const gameBoard = () => {
   let board = [];
   const createBoard = (str) => {
@@ -77,9 +76,15 @@ const scoreModule = (() => {
     else scoreBoard.draws++;
   };
 
-  const printScore = () => console.log(scoreBoard);
+  const printScore = () => {
+    return scoreBoard;
+  };
 
-  return { updateScore, printScore };
+  const resetScore = () => {        
+    scoreBoard = { alice: 0, bob: 0, draws: 0 };
+  };
+
+  return { updateScore, printScore, resetScore };
 })();
 
 const playRoundFactory = () => {
@@ -202,7 +207,7 @@ const playRoundFactory = () => {
     gameOver = false;
 
     currentPlayer = alice;
-
+winner = null;   
     console.log("Game reset! New round started.");
     game.printBoard();
     return board;
@@ -254,15 +259,87 @@ const round = playRoundFactory();
 // console.log(round.resetGame())
 //3. Winner state test
 
-round.playRound(0, 0); // Alice
-round.playRound(0, 0); // Bob
-round.playRound(1, 0); // Bob
-round.playRound(0, 1); // Alice
-round.playRound(1, 1); // Bob
-round.playRound(0, 2); // Alice wins
-const status = round.getStatus();
-console.log("Status before updating score:", status);
+// round.playRound(0, 0); // Alice
+// round.playRound(0, 0); // Bob
+// round.playRound(1, 0); // Bob
+// round.playRound(0, 1); // Alice
+// round.playRound(1, 1); // Bob
+// round.playRound(0, 2); // Alice wins
+// const status = round.getStatus();
+// console.log("Status before updating score:", status);
 
-scoreModule.updateScore(status.winner);
-scoreModule.printScore();
-round.resetGame();
+// scoreModule.updateScore(status.winner);
+// scoreModule.printScore();
+// round.resetGame();
+
+const displayControllerModule = () => {
+  const board = game.getBoard();
+  let scoreUpdated = false; // ✅ flag to stop multiple updates
+
+  const renderBoard = () => {
+    let container = document.querySelector("#board");
+    container.innerHTML = ""; // clear previous cells
+
+    for (let i = 0; i < board.length; i++) {
+      for (let j = 0; j < board.length; j++) {
+        let cell = document.createElement("button");
+        cell.setAttribute("data-row", i);
+        cell.setAttribute("data-col", j);
+        cell.textContent = board[i][j];
+        container.append(cell);
+
+        //  Event listener
+        cell.addEventListener("click", function (e) {
+          let row = Number(e.target.dataset.row);
+          let col = Number(e.target.dataset.col);
+          round.playRound(row, col);
+          display.renderBoard();
+
+          const status = round.getStatus();
+
+          //  Update score only once per game
+          if ((status.status === "winner" || status.status === "draw") && !scoreUpdated) {
+            scoreModule.updateScore(status.winner);
+            scoreUpdated = true; // stop further updates
+
+            const scoredisplay = document.querySelector("#scoreboard");
+            scoredisplay.textContent = ` Alice: ${
+              scoreModule.printScore().alice
+            },   Bob: ${scoreModule.printScore().bob},  Draws: ${
+              scoreModule.printScore().draws
+            }`;
+          }
+
+          // Show current turn or "Game Over"
+          const turnDisplay = document.querySelector("#turn");
+          turnDisplay.textContent = `Current Player: ${
+            round.getStatus().nextPlayer || "Game Over"
+          }`;
+        });
+      }
+    }
+  };
+
+  // expose reset method so you can reset flag when game resets
+  const resetDisplay = () => {
+    scoreUpdated = false;
+    renderBoard();
+     const turnDisplay = document.querySelector("#turn");
+  turnDisplay.textContent = `Current Player: Alice`; // Alice always starts
+  };
+
+  return {
+    renderBoard,
+    resetDisplay,
+  };
+};
+
+const display = displayControllerModule();
+display.renderBoard();
+document.querySelector("#resetBtn").addEventListener("click", () => {
+  round.resetGame();
+  display.resetDisplay();
+  scoreModule.resetScore();   //  reset scores
+  const scoredisplay = document.querySelector("#scoreboard");
+  scoredisplay.textContent = ` Alice: 0, Bob: 0, Draws: 0`;  //  refresh UI
+});

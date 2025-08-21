@@ -1,0 +1,69 @@
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 90vh;
+  gap: 30px;
+  flex-direction: row;
+}
+#board {
+  display: grid;
+  grid-template-columns: repeat(3, 100px);
+  grid-template-rows: repeat(3, 100px);
+  gap: 2px; /* optional spacing */
+  width: max-content;
+  height: max-content;
+  background-color: aqua;
+}
+
+
+#board button {
+  width: 100px;
+  height: 100px;
+  background-color: rgb(93, 231, 86);
+  font-size: xx-large;
+  font-weight: 600;
+ 
+}
+
+#turn {
+background: #82eae6;
+  padding: 10px 20px;
+  margin: 8px 0;
+  border-radius: 8px;
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
+  text-align: center;
+  width: 250px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+#scoreboard {
+background: #82eae6;
+  padding: 10px 20px;
+  margin: 8px 0;
+  border-radius: 8px;
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
+  text-align: center;
+  width: 250px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+#resetBtn {
+  background: #ff4d4d;
+  border: none;
+  padding: 10px 20px;
+  margin-top: 10px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: bold;
+  color: white;
+  cursor: pointer;
+  transition: background 0.2s ease-in-out;
+}
+
+#resetBtn:hover {
+  background: #e63939;
+}
